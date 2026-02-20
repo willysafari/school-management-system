@@ -17,7 +17,7 @@ class SchoolCategoryController extends Controller
     {
         // to get all
 
-        $category = SchoolCategory::all();
+        $category = SchoolCategory::get();
 
         return response()->json([
             'status' => 'suceess',

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('slug');
             $table->longText('content');
             $table->text('excerpt');
-            $table->string('thumbnail');
+            $table->string('thumbnail')->nullable();
             $table->enum('status',['draft','published','archieved'])->default('draft');
             $table->dateTime('published_at');
             $table->timestamps();

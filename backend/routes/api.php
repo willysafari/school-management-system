@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SchoolCategoryController;
+use App\Http\Controllers\Api\SchoolPostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -18,6 +20,9 @@ route::group(['middleware'=>'auth:sanctum'], function(){
    route::get('/logout',[AuthController::class,'logout'])->name('logout');
 
    route::apiResource('categories', SchoolCategoryController::class);
+
+// blog route
+   route::apiResource('posts', SchoolPostController::class);
 
 });
 
