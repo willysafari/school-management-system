@@ -92,7 +92,7 @@ class SchoolPostController extends Controller
     {
         //id of post
 
-               $validationdata = Validator::make($request->all(), [
+        $validationdata = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:school_categories,id',
             'title' => 'required|string|max:255',
@@ -119,10 +119,10 @@ class SchoolPostController extends Controller
                 'error' => 'posts not found',
             ]);
         }
-//    user of post
+        //    user of post
         $logined = Auth::user();
 
-        if($logined->id != $request->user_id){
+        if ($logined->id != $request->user_id) {
             return response()->json([
                 'status' => 'failed',
                 'error' => 'You are not own of the post',
@@ -138,15 +138,15 @@ class SchoolPostController extends Controller
             ]);
         }
 
-       $data=$request->all();
+        $data = $request->all();
 
-       SchoolPost::create($data);
+        SchoolPost::create($data);
 
         return response()->json([
-                'status' => 'success',
-                'message' => 'Data update successfully',
-                'data' => $data,
-            ]);
+            'status' => 'success',
+            'message' => 'Data update successfully',
+            'data' => $data,
+        ]);
 
 
     }
@@ -157,5 +157,83 @@ class SchoolPostController extends Controller
     public function destroy(string $id)
     {
         //
+        $blogPost = SchoolPost::find($id);
+
+        if (!$blogPost) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Post not found',
+            ], 400);
+        }
+
+        $blogPost->delete();
+
+
+
+        return response()->json([
+            'status' => 'succcess',
+            'message' => 'Post Delete successfully',
+
+        ], 200);
+
+    }
+    public function blogPostImage(Request $request, int $id)
+    {
+        $blogPost = SchoolPost::find($id);
+
+        if (!$blogPost) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Post not found',
+            ], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
+            'thumbnail' => 'required|image|mimes:png,jpeg,gif,jpg|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'fail',
+                'error' => $validator->errors(),
+
+            ]);
+        }
+
+
+        $loginedInUser = Auth::user();
+
+        if ($loginedInUser->id != $request->user_id) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'UnAuthorized Access',
+
+            ], 400);
+        }
+
+        $imagePath = null;
+
+        if ($request->hasFile('thumbnail') && $request->file('thumbnail')->isvalid()) {
+            $file = $request->file('thumbnail');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+
+            // move the file to public directory
+            $file->move(public_path('storage/blogpostimages'), $fileName);
+
+            // save the relative path to database
+            $imagePath = "storage/blogpostimages/" . $fileName;
+        }
+
+        $blogPost->thumbnail = isset($imagePath) ? $imagePath : $blogPost->thumbnail;
+        $blogPost->save();
+
+
+        return response()->json([
+            'status' => 'succcess',
+            'message' => 'image updates successfully',
+
+        ], 200);
+
     }
 }

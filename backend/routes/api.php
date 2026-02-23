@@ -23,6 +23,10 @@ route::group(['middleware'=>'auth:sanctum'], function(){
 
 // blog route
    route::apiResource('posts', SchoolPostController::class);
+   //edit the images
+   route::post('/blog-post-image/{post}',[SchoolPostController::class,'blogPostImage'])->name('blog-post-image');
 
 });
+
+
 
